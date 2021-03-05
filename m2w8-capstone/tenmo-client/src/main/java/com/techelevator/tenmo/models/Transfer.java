@@ -1,82 +1,62 @@
 package com.techelevator.tenmo.models;
 
-import java.math.BigDecimal;
+
 
 public class Transfer {
 
-	private int transferId;
-	private int transferTypeId;
-	private int transferStatusId;
-	private int accountFrom;
-	private int accountTo;
-	private BigDecimal amount;
-	private String transferType;
-	private String transferStatus;
-	private String userFrom;
-	private String userTo;
-	
-	
-	public int getTransferId() {
-		return transferId;
+	private int transfer_id;
+	private int transfer_type_id;
+	private int transfer_status_id;
+	private Double amount;
+	private int account_to;
+	private int account_from;
+
+	public int getAccount_from() {
+		return account_from;
 	}
-	public void setTransferId(int transferId) {
-		this.transferId = transferId;
+
+	public void setAccount_from(int account_from) {
+		this.account_from = account_from;
 	}
-	public int getTransferTypeId() {
-		return transferTypeId;
-	}
-	public void setTransferTypeId(int transferTypeId) {
-		this.transferTypeId = transferTypeId;
-	}
-	public int getTransferStatusId() {
-		return transferStatusId;
-	}
-	public void setTransferStatusId(int transferStatusId) {
-		this.transferStatusId = transferStatusId;
-	}
-	public int getAccountFrom() {
-		return accountFrom;
-	}
-	public void setAccountFrom(int accountFrom) {
-		this.accountFrom = accountFrom;
-	}
-	public int getAccountTo() {
-		return accountTo;
-	}
-	public void setAccountTo(int accountTo) {
-		this.accountTo = accountTo;
-	}
-	public BigDecimal getAmount() {
+
+	public Double getAmount() {
 		return amount;
 	}
-	public void setAmount(BigDecimal amount) {
+
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
-	public String getTransferType() {
-		return transferType;
+
+	public int getAccount_to() {
+		return account_to;
 	}
-	public void setTransferType(String transferType) {
-		this.transferType = transferType;
+
+	public void setAccount_to(int account_to) {
+		this.account_to = account_to;
 	}
-	public String getTransferStatus() {
-		return transferStatus;
+
+	public int getTransfer_id() {
+		return transfer_id;
 	}
-	public void setTransferStatus(String transferStatus) {
-		this.transferStatus = transferStatus;
+
+	public void setTransfer_id(int transfer_id) {
+		this.transfer_id = transfer_id;
 	}
-	public String getUserFrom() {
-		return userFrom;
+
+	public int getTransfer_type_id() {
+		return transfer_type_id;
 	}
-	public void setUserFrom(String userFrom) {
-		this.userFrom = userFrom;
+
+	public void setTransfer_type_id(int transfer_type_id) {
+		this.transfer_type_id = transfer_type_id;
 	}
-	public String getUserTo() {
-		return userTo;
+
+	public int getTransfer_status_id() {
+		return transfer_status_id;
 	}
-	public void setUserTo(String userTo) {
-		this.userTo = userTo;
+
+	public void setTransfer_status_id(int transfer_status_id) {
+		this.transfer_status_id = transfer_status_id;
 	}
-	
-	
 
 }

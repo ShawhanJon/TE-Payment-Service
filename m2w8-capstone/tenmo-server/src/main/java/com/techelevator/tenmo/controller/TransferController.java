@@ -1,6 +1,5 @@
 package com.techelevator.tenmo.controller;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,54 +9,68 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techelevator.tenmo.dao.TransferDAO;
+import com.techelevator.tenmo.dao.UserDAO;
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferBack;
 
-
-@RestController
 @PreAuthorize("isAuthenticated()")
+@RestController
 public class TransferController {
-
 	@Autowired
 	private TransferDAO transferDAO;
-	
-	
 
-	@RequestMapping(path = "account/transfers/{id}", method = RequestMethod.GET) 
-	public List<Transfer> getAllTransfers(@PathVariable int id) {
-		List<Transfer> output = transferDAO.getAllTransfers(id);
-		return output;
+	@Autowired
+	public TransferController(TransferDAO transferDAO) {
+		this.transferDAO = transferDAO;
 	}
-	
-	@RequestMapping(path = "transfers/{id}", method = RequestMethod.GET) 
-	public Transfer getSelectedTransfer(@PathVariable int id) {
-		Transfer transfer = transferDAO.getTransferById(id);
-		return transfer;
+
+	@RequestMapping(value = "/transfers/{id}/viewDetails", method = RequestMethod.GET)
+	public Transfer viewTransferDetails(@PathVariable int id) {
+		return transferDAO.viewTransferDetails(id);
 	}
-	
-	@RequestMapping(path = "transfer", method = RequestMethod.POST) 
-	public String sendTransfer(@RequestBody Transfer transfer) {
-		String results = transferDAO.sendTransfer(transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
-		return results;
+
+	@RequestMapping(value = "/transfers/{id}/viewAll", method = RequestMethod.GET)
+	public List<TransferBack> viewTransfers(@PathVariable int id) {
+		return transferDAO.viewTransfers(id);
 	}
-	
-	@RequestMapping(path = "request", method = RequestMethod.POST) 
-	public String requestTransfer(@RequestBody Transfer transfer) {
-		String results = transferDAO.requestTransfer(transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
-		return results;
+
+	@RequestMapping(value = "/transfers/{id}/pending", method = RequestMethod.GET)
+	public List<TransferBack> viewPending(@PathVariable int id) {
+		return transferDAO.viewPending(id);
 	}
-	
-	@RequestMapping(path = "request/{id}", method = RequestMethod.GET) 
-	public List<Transfer> getAllRequests(@PathVariable int id) {
-		List<Transfer> output = transferDAO.getPendingRequests(id);
-		return output;
+
+	@RequestMapping(value = "transfers/{id}/pending/2/{transferId}", method = RequestMethod.PUT)
+	public void updatePendingApprove(@PathVariable int id, @PathVariable int transferId) {
+		transferDAO.updatePendingApprove(transferId);
 	}
-	
-	@RequestMapping(path = "transfer/status/{statusId}", method = RequestMethod.PUT) 
-	public String updateRequest(@RequestBody Transfer transfer, @PathVariable int statusId) {
-		String output = transferDAO.updateRequest(transfer, statusId);
-		return output;
+
+	@RequestMapping(value = "transfers/{id}/pending/3/{transferId}", method = RequestMethod.PUT)
+	public void updatePendingReject(@PathVariable int id, @PathVariable int transferId) {
+		transferDAO.updatePendingReject(transferId);
 	}
+
+	@RequestMapping(value = "/transfer/send", method = RequestMethod.POST)
+	public void transferSend(@RequestBody Transfer transfer) {
+		transferDAO.transferSend(transfer);
+		transferDAO.updateBalance(transfer);
+		transferDAO.updateBalance1(transfer);
+		transferDAO.updateBalance2(transfer);
+	}
+
+	@RequestMapping(value = "/transfer/request", method = RequestMethod.POST)
+	public void transferRequest(@RequestBody Transfer transfer) {
+		transferDAO.transferRequest(transfer);
+	}
+
+	@RequestMapping(value = "/transfer", method = RequestMethod.PUT)
+	public void makeTransfer(@RequestBody Transfer transfer) {
+		transferDAO.updateBalance(transfer);
+		transferDAO.updateBalance1(transfer);
+		transferDAO.updateBalance2(transfer);
+	}
+
 }

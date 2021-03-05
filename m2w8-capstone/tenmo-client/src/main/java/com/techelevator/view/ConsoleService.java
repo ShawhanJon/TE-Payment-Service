@@ -38,7 +38,7 @@ public class ConsoleService {
 			// eat the exception, an error message will be displayed below since choice will be null
 		}
 		if (choice == null) {
-			out.println(System.lineSeparator() + "*** " + userInput + " is not a valid option ***" + System.lineSeparator());
+			out.println("\n*** " + userInput + " is not a valid option ***\n");
 		}
 		return choice;
 	}
@@ -49,7 +49,7 @@ public class ConsoleService {
 			int optionNum = i + 1;
 			out.println(optionNum + ") " + options[i]);
 		}
-		out.print(System.lineSeparator() + "Please choose an option >>> ");
+		out.print("\nPlease choose an option >>> ");
 		out.flush();
 	}
 
@@ -68,7 +68,22 @@ public class ConsoleService {
 			try {
 				result = Integer.parseInt(userInput);
 			} catch(NumberFormatException e) {
-				out.println(System.lineSeparator() + "*** " + userInput + " is not valid ***" + System.lineSeparator());
+				out.println("\n*** " + userInput + " is not valid ***\n");
+			}
+		} while(result == null);
+		return result;
+	}
+	
+	public Double getUserInputDouble(String prompt) {
+		Double result = null;
+		do {
+			out.print(prompt+": ");
+			out.flush();
+			String userInput = in.nextLine();
+			try {
+				result = Double.parseDouble(userInput);
+			} catch(NumberFormatException e) {
+				out.println("\n*** " + userInput + " is not valid ***\n");
 			}
 		} while(result == null);
 		return result;

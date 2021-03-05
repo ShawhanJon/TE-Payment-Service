@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.services;
 
+
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -12,15 +13,20 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
+import com.techelevator.tenmo.models.Transfer;
+import com.techelevator.tenmo.models.TransferBack;
+import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.models.UserCredentials;
 
 public class AuthenticationService {
 
-    private String baseUrl;
+	public static String AUTH_TOKEN = "";
+    private String BASE_URL;
     private RestTemplate restTemplate = new RestTemplate();
+    
 
     public AuthenticationService(String url) {
-        this.baseUrl = url;
+        this.BASE_URL = url;
     }
 
     public AuthenticatedUser login(UserCredentials credentials) throws AuthenticationServiceException {
@@ -42,7 +48,7 @@ public class AuthenticationService {
 
 	private AuthenticatedUser sendLoginRequest(HttpEntity<UserCredentials> entity) throws AuthenticationServiceException {
 		try {	
-			ResponseEntity<AuthenticatedUser> response = restTemplate.exchange(baseUrl + "login", HttpMethod.POST, entity, AuthenticatedUser.class);
+			ResponseEntity<AuthenticatedUser> response = restTemplate.exchange(BASE_URL + "login", HttpMethod.POST, entity, AuthenticatedUser.class);
 			return response.getBody(); 
 		} catch(RestClientResponseException ex) {
 			String message = createLoginExceptionMessage(ex);
@@ -52,7 +58,7 @@ public class AuthenticationService {
 
     private ResponseEntity<Map> sendRegistrationRequest(HttpEntity<UserCredentials> entity) throws AuthenticationServiceException {
     	try {
-			return restTemplate.exchange(baseUrl + "register", HttpMethod.POST, entity, Map.class);
+			return restTemplate.exchange(BASE_URL + "register", HttpMethod.POST, entity, Map.class);
 		} catch(RestClientResponseException ex) {
 			String message = createRegisterExceptionMessage(ex);
 			throw new AuthenticationServiceException(message);
@@ -80,4 +86,111 @@ public class AuthenticationService {
 		}
 		return message;
 	}
+	
+	  public double getBalance(String token) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  double balance = 0.00;
+			try {
+				balance = restTemplate.exchange(BASE_URL + "balance", HttpMethod.GET, makeAuthEntity(), double.class).getBody();
+			} catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+			return balance;
+	    }
+	  
+	  private HttpEntity makeAuthEntity() {
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setBearerAuth(AUTH_TOKEN);
+	        HttpEntity entity = new HttpEntity<>(headers);
+	        return entity;
+	    }
+	  private HttpEntity makeJSONEntity(String token, Transfer jsonBody) {
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.setBearerAuth(AUTH_TOKEN);
+			HttpEntity entity = new HttpEntity<>(jsonBody, headers);
+				return entity;
+			}
+	  
+	  public void transferSend(String token, Transfer transferBody) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  try {
+			 restTemplate.exchange(BASE_URL + "transfer/send", HttpMethod.POST, makeJSONEntity(AUTH_TOKEN, transferBody), Transfer.class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+	  }
+	  
+	  public void transferRequest(String token, Transfer transferBody) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  try {
+			 restTemplate.exchange(BASE_URL + "transfer/request", HttpMethod.POST, makeJSONEntity(AUTH_TOKEN, transferBody), Transfer.class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+	  }
+
+	  public TransferBack[] viewTransfers(String token, int userId) throws AuthenticationServiceException {
+		  TransferBack[] transfers = null;
+		  AUTH_TOKEN = token;
+		  try {
+			  transfers = restTemplate.exchange(BASE_URL + "transfers/" + userId + "/viewAll", HttpMethod.GET, makeAuthEntity(), TransferBack[].class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+		  return transfers;
+	  }
+	  
+	  public Transfer viewTransferDetails(String token, int userId) throws AuthenticationServiceException {
+		Transfer transfer = null;
+		AUTH_TOKEN = token;
+		 try {
+			  transfer = restTemplate.exchange(BASE_URL + "transfers/" + userId + "/viewDetails", HttpMethod.GET, makeAuthEntity(), Transfer.class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+		  return transfer;
+	  }
+	  
+	  public TransferBack[] viewPending(String token, int userId) throws AuthenticationServiceException {
+		  TransferBack[] pending = null;
+		  AUTH_TOKEN = token;
+		  try {
+			  pending = restTemplate.exchange(BASE_URL + "transfers/" + userId + "/pending", HttpMethod.GET, makeAuthEntity(), TransferBack[].class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+		  return pending;
+	  }
+	  
+	public void updatePendingApprove(String token, int userId, int transferId) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  try {
+			  restTemplate.exchange(BASE_URL+"transfers/" + userId + "/pending/2/" + transferId, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+	  }
+	  
+	  public void updatePendingReject(String token, int userId, int transferId) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  try {
+			  restTemplate.exchange(BASE_URL+"transfers/" + userId + "/pending/3/" + transferId, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+	  }
+
+	  public User[] getUsers(String token) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  User[] users;
+		  try {
+			  users = restTemplate.exchange(BASE_URL + "account/allaccounts", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();			  
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+		  return users;
+	  }
+	  
+	  
 }
