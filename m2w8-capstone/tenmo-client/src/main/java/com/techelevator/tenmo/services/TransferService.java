@@ -29,7 +29,7 @@ public class TransferService {
 	
 
 	
-//	transferList **Case 5 & 6**
+//	List of Transfers **Case 5 & 6**
 	public Transfer[] transfersList() {
 		Transfer [] output = null;
 		try {
@@ -83,7 +83,7 @@ public class TransferService {
 	
 	
 	
-//	sendTEBucks **Case 4**
+//	User send TE Bucks **Case 4**
 	public void sendBucks() {
 		User[] users = null;
 		Transfer transfer = new Transfer();
@@ -121,7 +121,7 @@ public class TransferService {
 	
 	
 	
-//	requestTEBucks **Case 7**
+//	User Requests TE Bucks **Case 7**
 	public void requestBucks() {
 		User[] users = null;
 		Transfer transfer = new Transfer();
@@ -160,7 +160,7 @@ public class TransferService {
 	
 	
 	
-//	requestList **Case 8 & 9**
+//	Transfers needing approval **Case 8 & 9**
 	public Transfer[] transfersRequestList() {
 		Transfer [] output = null;
 		String results;
@@ -226,7 +226,7 @@ public class TransferService {
 	
 	
 	
-//	userList
+//	Lists users for selection
 	public User[] getUsers() {
 		User[] user = null;
 		try {
