@@ -14,6 +14,7 @@ import com.techelevator.tenmo.dao.AccountDAO;
 import com.techelevator.tenmo.dao.UserDAO;
 import com.techelevator.tenmo.model.User;
 
+
 @RestController
 @PreAuthorize("isAuthenticated()")
 public class AccountController {
@@ -22,8 +23,6 @@ public class AccountController {
 	private AccountDAO accountDAO;
 	@Autowired
 	private UserDAO userDAO;
-	
-	
 	
 	public AccountController(AccountDAO accountDAO, UserDAO userDao) {
 		this.accountDAO = accountDAO;
