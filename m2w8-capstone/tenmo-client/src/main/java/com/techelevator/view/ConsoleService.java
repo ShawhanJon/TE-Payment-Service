@@ -6,6 +6,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+import com.techelevator.tenmo.models.Transfer;
+import com.techelevator.tenmo.models.User;
+
 public class ConsoleService {
 
 	private PrintWriter out;
@@ -72,5 +75,36 @@ public class ConsoleService {
 			}
 		} while(result == null);
 		return result;
+	}
+	
+	public void printUsers(User user) {
+			System.out.println("----------------------------------");
+			System.out.println("User ID: " + user.getId());
+			System.out.println("Username: " + user.getUsername());
+		
+	}
+	public void printTransfers(Transfer transfer) {
+		System.out.println("ID: " + transfer.getTransferID());
+		System.out.println("From: " + transfer.getSenderUsername());
+		System.out.println("To: " + transfer.getRecipientUsername());
+		System.out.println("Amount: " + transfer.getAmount());
+		System.out.println("-------------------------------");
+	}
+	public void printTransferDetails(Transfer[] transfers, long selection) {
+		for(Transfer t : transfers) {
+			if(t.getTransferID() == selection) {
+				System.out.println("");
+				System.out.println("-------------------------------");
+				System.out.println("TRANSFER DETAILS");
+				System.out.println("-------------------------------");
+				System.out.println("ID: " + t.getTransferID());
+				System.out.println("From: " + t.getSenderUsername());
+				System.out.println("To: " + t.getRecipientUsername());
+				System.out.println("Type: Send");
+				System.out.println("Status: Approved");
+				System.out.println("Amount: $" + t.getAmount());
+				System.out.println("-------------------------------");
+			}
+		}
 	}
 }
