@@ -30,7 +30,7 @@ public class JdbcUserDAO implements UserDAO {
 		int userId = findIdByUsername(username);
 		double balance = 0.0;
 
-		String sql = "Select balance from accounts where user_id = ?";
+		String sql = "SELECT balance FROM accounts WHERE user_id = ?";
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, userId);
 		while (row.next()) {
 			balance = row.getDouble("balance");
@@ -40,13 +40,13 @@ public class JdbcUserDAO implements UserDAO {
 
 	@Override
 	public int findIdByUsername(String username) {
-		return jdbcTemplate.queryForObject("select user_id from users where username = ?", int.class, username);
+		return jdbcTemplate.queryForObject("SELECT user_id FROM users WHERE username = ?", int.class, username);
 	}
 
 	@Override
 	public List<User> findAll() {
 		List<User> users = new ArrayList<>();
-		String sql = "select * from users";
+		String sql = "SELECT * FROM users";
 
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
 		while (results.next()) {
@@ -73,7 +73,7 @@ public class JdbcUserDAO implements UserDAO {
 		boolean accountCreated = false;
 
 		// create user
-		String insertUser = "insert into users (username,password_hash) values(?,?)";
+		String insertUser = "INSERT INTO users (username,password_hash) VALUES(?,?)";
 		String password_hash = new BCryptPasswordEncoder().encode(password);
 
 		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -87,7 +87,7 @@ public class JdbcUserDAO implements UserDAO {
 		int newUserId = (int) keyHolder.getKeys().get(id_column);
 
 		// create account
-		String insertAccount = "insert into accounts (user_id,balance) values(?,?)";
+		String insertAccount = "INSERT INTO accounts (user_id,balance) VALUES(?,?)";
 		accountCreated = jdbcTemplate.update(insertAccount, newUserId, STARTING_BALANCE) == 1;
 
 		return userCreated && accountCreated;

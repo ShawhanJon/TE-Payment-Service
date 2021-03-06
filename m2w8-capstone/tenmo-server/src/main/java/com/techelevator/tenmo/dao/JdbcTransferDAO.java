@@ -77,13 +77,12 @@ public class JdbcTransferDAO implements TransferDAO {
 		int transferType = 0;
 		int transferStatus = 0;
 
-		String sql = "SELECT * FROM transfers WHERE account_from = ? OR account_to = ?";
+		String sql = "SELECT * FROM transfers WHERE account_from = ?";
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, id, id);
 		while (row.next()) {
 			transferId = row.getInt("transfer_id");
 			amount = row.getDouble("amount");
 			accountIdToUser = row.getLong("account_to");
-			accountIdFromUser = row.getLong("account_from");
 			transferType = row.getInt("transfer_type_id");
 			transferStatus = row.getInt("transfer_status_id");
 
