@@ -1,19 +1,20 @@
 package com.techelevator.tenmo.dao.jdbc;
 
-import com.techelevator.tenmo.dao.UserDAO;
-import com.techelevator.tenmo.model.User;
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.List;
+import com.techelevator.tenmo.dao.UserDAO;
+import com.techelevator.tenmo.model.User;
 
-@Component
+@Service
 public class JDBCUserDAO implements UserDAO {
 
     private static final double STARTING_BALANCE = 1000;

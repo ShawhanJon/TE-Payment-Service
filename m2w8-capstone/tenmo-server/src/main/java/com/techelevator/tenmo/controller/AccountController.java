@@ -1,8 +1,9 @@
 package com.techelevator.tenmo.controller;
 
-import java.security.Principal;
+import java.math.BigDecimal; 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,38 +11,34 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techelevator.tenmo.dao.AccountDAO;
-import com.techelevator.tenmo.dao.jdbc.JDBCAccountDAO;
-import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.dao.UserDAO;
+import com.techelevator.tenmo.model.User;
 
-@PreAuthorize("isAuthenticated()")
 @RestController
+@PreAuthorize("isAuthenticated()")
 public class AccountController {
 
+	@Autowired
 	private AccountDAO accountDAO;
-	 
-	public AccountController(AccountDAO dao) {
-		this.accountDAO = dao;
+	@Autowired
+	private UserDAO userDAO;
+
+	
+	public AccountController(AccountDAO accountDAO, UserDAO userDAO) {
+		this.accountDAO = accountDAO;
+		this.userDAO = userDAO;
 	}
 	
-	@RequestMapping(path = "/accounts", method = RequestMethod.GET)
-	public List<Account> list(Principal principal){
-		return accountDAO.list(accountDAO.getAccountByUsername(principal.getName()).getAccountId());
+	@RequestMapping(path = "balance/{id}", method = RequestMethod.GET)
+	public BigDecimal getBalance(@PathVariable int id) {
+		BigDecimal balance = accountDAO.getBalance(id);
+		return balance;
 	}
 	
-	@RequestMapping(path = "/accounts/{id}", method = RequestMethod.GET)
-	public Account get(@PathVariable int id) {
-		return accountDAO.getAccountById(id);
+	@RequestMapping(path = "listusers", method = RequestMethod.GET)
+	public List <User> listUsers() {
+		List <User> users = userDAO.findAll();
+		return users;
 	}
-	
-	@RequestMapping(path = "/accounts/{id}/balance", method = RequestMethod.GET)
-	public Double getBalance(@PathVariable int id) {
-		return accountDAO.getAccountById(id).getBalance();
-	}
-	
-	@RequestMapping(path = "/accounts/balance", method = RequestMethod.GET)
-	public Double getBalance(Principal principal) {
-		return (accountDAO.getAccountByUsername(principal.getName())).getBalance();
-	}
-	
 	
 }
