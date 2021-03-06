@@ -17,8 +17,7 @@ public class DAOIntegrationTest {
 	public static void setupDataSource() {
 		dataSource = new SingleConnectionDataSource();
 		dataSource.setUrl("jdbc:postgresql://localhost:8080/TEnmo");
-		dataSource.setUsername("TEnmo");
-		dataSource.setPassword("TEnmo");
+		dataSource.setUsername("postgres");
 		/*
 		 * The following line disables autocommit for connections returned by this
 		 * DataSource. This allows us to rollback any changes after each test
