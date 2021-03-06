@@ -1,35 +1,22 @@
 package com.techelevator;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-
-import com.techelevator.model.Venue;
-import com.techelevator.model.dao.jdbc.JDBCVenueDAO;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
-
-import java.sql.SQLException;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 public class EXAMPLE__JDBC__IntegrationTest extends DAOIntegrationTest{
 	
 
-	private JDBCVenueDAO dao;
+	//private JDBCVenueDAO dao;
 	private JdbcTemplate jdbcTemplate;
 	
 	
-	@Before
+	//@Before
 	public void setup() {
 		
-			dao = new JDBCVenueDAO(getDataSource());
+			//dao = new JDBCVenueDAO(getDataSource());
 			jdbcTemplate = new JdbcTemplate(getDataSource());
 		}
 
@@ -43,7 +30,7 @@ public class EXAMPLE__JDBC__IntegrationTest extends DAOIntegrationTest{
 
 		Venue venue = getNewVenue();
 		
-		dao.save(venue);
+		//dao.save(venue);
 
 		//public List<Venue> getAllVenues()
 		
