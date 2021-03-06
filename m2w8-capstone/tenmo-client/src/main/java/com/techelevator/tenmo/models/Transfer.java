@@ -1,68 +1,79 @@
 package com.techelevator.tenmo.models;
 
-public class Transfer {
-	private long transferID;
-	private String senderUsername;
-	private long senderID;
-	private String recipientUsername;
-	private long recipientID;
-	private double amount;
-	private boolean isApproved;
-	private String type;
+import java.math.BigDecimal;
+
+public class Transfer
+{
+	private int id;
+	private String transferType;
+	private String transferStatus;
+	private String userFrom;
+	private String userTo;
+	private BigDecimal amount;
 	
-	
-	
-	
-	
-	public String getSenderUsername() {
-		return senderUsername;
+	public int getId()
+	{
+		return id;
 	}
-	public void setSenderUsername(String senderUsername) {
-		this.senderUsername = senderUsername;
+
+	public void setId(int id)
+	{
+		this.id = id;
 	}
-	public String getRecipientUsername() {
-		return recipientUsername;
+
+	public String getTransferType()
+	{
+		return transferType;
 	}
-	public void setRecipientUsername(String recipientUsername) {
-		this.recipientUsername = recipientUsername;
+
+	public void setTransferType(String transferType)
+	{
+		this.transferType = transferType;
 	}
-	public long getTransferID() {
-		return transferID;
+
+	public String getTransferStatus()
+	{
+		return transferStatus;
 	}
-	public void setTransferID(long transferID) {
-		this.transferID = transferID;
+
+	public void setTransferStatus(String transferStatus)
+	{
+		this.transferStatus = transferStatus;
 	}
-	public long getSenderID() {
-		return senderID;
+
+	public String getUserFrom()
+	{
+		return userFrom;
 	}
-	public void setSenderID(long senderID) {
-		this.senderID = senderID;
+
+	public void setUserFrom(String userFrom)
+	{
+		this.userFrom = userFrom;
 	}
-	public long getRecipientID() {
-		return recipientID;
+
+	public String getUserTo()
+	{
+		return userTo;
 	}
-	public void setRecipientID(long recipientID) {
-		this.recipientID = recipientID;
+
+	public void setUserTo(String userTo)
+	{
+		this.userTo = userTo;
 	}
-	public double getAmount() {
+
+	public BigDecimal getAmount()
+	{
 		return amount;
 	}
-	public void setAmount(double amount) {
+
+	public void setAmount(BigDecimal amount)
+	{
 		this.amount = amount;
 	}
-	public boolean isApproved() {
-		return isApproved;
-	}
-	public void setApproved(boolean isApproved) {
-		this.isApproved = isApproved;
-	}
-	public String getType() {
-		return type;
-	}
-	public void setType(String type) {
-		this.type = type;
-	}
 
-	
-
+	@Override
+	public String toString()
+	{
+		return "Transfer ID: " + this.getId() + ", Amount: $" + this.getAmount() + ", From: " + this.getUserFrom() + " To: " + this.getUserTo();
+	}
 }

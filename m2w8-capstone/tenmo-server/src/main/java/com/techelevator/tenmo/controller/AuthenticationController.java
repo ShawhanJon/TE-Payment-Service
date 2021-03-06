@@ -17,12 +17,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.techelevator.tenmo.dao.AccountDAO;
 import com.techelevator.tenmo.dao.UserDAO;
+import com.techelevator.tenmo.exceptions.UserAlreadyExistsException;
 import com.techelevator.tenmo.model.LoginDTO;
 import com.techelevator.tenmo.model.RegisterUserDTO;
 import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserAlreadyExistsException;
 import com.techelevator.tenmo.security.jwt.JWTFilter;
 import com.techelevator.tenmo.security.jwt.TokenProvider;
 
@@ -35,17 +34,12 @@ public class AuthenticationController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private UserDAO userDAO;
-    private AccountDAO accountDAO;
-    
 
-    public AuthenticationController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserDAO userDAO, AccountDAO accountDAO) {
+    public AuthenticationController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserDAO userDAO) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userDAO = userDAO;
-        this.accountDAO = accountDAO;
-       
     }
-
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginDTO loginDto) {

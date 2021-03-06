@@ -1,27 +1,33 @@
 package com.techelevator.view;
 
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.security.Principal;
+import java.util.List;
 import java.util.Scanner;
 
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 
-public class ConsoleService {
+public class ConsoleService
+{
 
 	private PrintWriter out;
 	private Scanner in;
 
-	public ConsoleService(InputStream input, OutputStream output) {
+	public ConsoleService(InputStream input, OutputStream output)
+	{
 		this.out = new PrintWriter(output, true);
 		this.in = new Scanner(input);
 	}
 
-	public Object getChoiceFromOptions(Object[] options) {
+	public Object getChoiceFromOptions(Object[] options)
+	{
 		Object choice = null;
-		while (choice == null) {
+		while (choice == null)
+		{
 			displayMenuOptions(options);
 			choice = getChoiceFromUserInput(options);
 		}
@@ -29,26 +35,35 @@ public class ConsoleService {
 		return choice;
 	}
 
-	private Object getChoiceFromUserInput(Object[] options) {
+	private Object getChoiceFromUserInput(Object[] options)
+	{
 		Object choice = null;
 		String userInput = in.nextLine();
-		try {
+		try
+		{
 			int selectedOption = Integer.valueOf(userInput);
-			if (selectedOption > 0 && selectedOption <= options.length) {
+			if (selectedOption > 0 && selectedOption <= options.length)
+			{
 				choice = options[selectedOption - 1];
 			}
-		} catch (NumberFormatException e) {
-			// eat the exception, an error message will be displayed below since choice will be null
 		}
-		if (choice == null) {
+		catch (NumberFormatException e)
+		{
+			// eat the exception, an error message will be displayed below since choice will
+			// be null
+		}
+		if (choice == null)
+		{
 			out.println("\n*** " + userInput + " is not a valid option ***\n");
 		}
 		return choice;
 	}
 
-	private void displayMenuOptions(Object[] options) {
+	private void displayMenuOptions(Object[] options)
+	{
 		out.println();
-		for (int i = 0; i < options.length; i++) {
+		for (int i = 0; i < options.length; i++)
+		{
 			int optionNum = i + 1;
 			out.println(optionNum + ") " + options[i]);
 		}
@@ -56,55 +71,163 @@ public class ConsoleService {
 		out.flush();
 	}
 
-	public String getUserInput(String prompt) {
-		out.print(prompt+": ");
+	public String getUserInput(String prompt)
+	{
+		out.print(prompt + ": ");
 		out.flush();
 		return in.nextLine();
 	}
 
-	public Integer getUserInputInteger(String prompt) {
+	public Integer getUserInputInteger(String prompt)
+	{
 		Integer result = null;
-		do {
-			out.print(prompt+": ");
+		do
+		{
+			out.print(prompt + ": ");
 			out.flush();
 			String userInput = in.nextLine();
-			try {
+			try
+			{
 				result = Integer.parseInt(userInput);
-			} catch(NumberFormatException e) {
+			}
+			catch (NumberFormatException e)
+			{
 				out.println("\n*** " + userInput + " is not valid ***\n");
 			}
-		} while(result == null);
+		}
+		while (result == null);
 		return result;
 	}
 	
-	public void printUsers(User user) {
-			System.out.println("----------------------------------");
-			System.out.println("User ID: " + user.getId());
-			System.out.println("Username: " + user.getUsername());
+	public void displayBalance(BigDecimal balance)
+	{
+		out.println();
+		out.println();
+		out.print("Your current account balance is: $" + balance);
+		out.println();
+		out.flush();
+	}
+	
+	public void displayUsers(List<User> users)
+	{
+		out.println();
+		out.println();
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		out.println("Users");
+		out.println(String.format("%-12s%s", "ID", "Name"));
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		
+		for (User user : users)
+		{
+			out.println(String.format("%-12d%s", user.getId(), user.getUsername()));
+		}
+		
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		out.println();
+		out.flush();
+	}
+	
+	public void displayTransfers(List<Transfer> transfers, String username)
+	{
+		out.println();
+		out.println();
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		out.println("Transfers");
+		out.println(String.format("%-12s%-26s%12s", "ID", "From/To", "Amount "));
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		
+		for (Transfer transfer : transfers)
+		{
+			String from = transfer.getUserFrom();
+			String to = transfer.getUserTo();
+			
+			String fromTo = "From:";
+			String name = from;
+			String amount = transfer.getAmount().toString();
+			
+			if(from.equalsIgnoreCase(username))
+			{
+				fromTo = "To:";
+				name = to;
+			}
+			out.println(String.format("%-12d"	// Transfer ID
+									+ "%-6s"	// From/To
+									+ "%-20s"	// Name
+									+ "%-2s"	// $
+									+ "%10s"	// Amount
+									, transfer.getId()
+									, fromTo
+									, name
+									, "$ "
+									, amount));
+		}
+		
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		out.println();
+		out.flush();
+	
 		
 	}
-	public void printTransfers(Transfer transfer) {
-		System.out.println("ID: " + transfer.getTransferID());
-		System.out.println("From: " + transfer.getSenderUsername());
-		System.out.println("To: " + transfer.getRecipientUsername());
-		System.out.println("Amount: " + transfer.getAmount());
-		System.out.println("-------------------------------");
-	}
-	public void printTransferDetails(Transfer[] transfers, long selection) {
-		for(Transfer t : transfers) {
-			if(t.getTransferID() == selection) {
-				System.out.println("");
-				System.out.println("-------------------------------");
-				System.out.println("TRANSFER DETAILS");
-				System.out.println("-------------------------------");
-				System.out.println("ID: " + t.getTransferID());
-				System.out.println("From: " + t.getSenderUsername());
-				System.out.println("To: " + t.getRecipientUsername());
-				System.out.println("Type: Send");
-				System.out.println("Status: Approved");
-				System.out.println("Amount: $" + t.getAmount());
-				System.out.println("-------------------------------");
-			}
+
+	public void displayPendingTransfers(List<Transfer> transfers)
+	{
+		out.println();
+		out.println();
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		out.println("Pending Transfers");
+		out.println(String.format("%-12s%-26s%12s", "ID", "To", "Amount "));
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		
+		for (Transfer transfer : transfers)
+		{
+			String name = transfer.getUserTo();
+			String amount = transfer.getAmount().toString();
+			
+//			if(from.equalsIgnoreCase(username))
+//			{
+//				fromTo = "To:";
+//				name = to;
+//			}
+			out.println(String.format("%-12d"	// Transfer ID
+									+ "%-26s"	// Name
+									+ "%-2s"	// $
+									+ "%10s"	// Amount
+									, transfer.getId()
+									, name
+									, "$ "
+									, amount));
 		}
+		
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		out.println();
+		out.flush();
+	
+		
+	}
+
+	public void displayTransferDetails(Transfer transfer)
+	{
+		out.println();
+		out.println();
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		out.println("Transfer Details");
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		
+		out.println(String.format("%-12s%s", "ID:", transfer.getId()));
+		out.println(String.format("%-12s%s", "From:", transfer.getUserFrom()));
+		out.println(String.format("%-12s%s", "To:", transfer.getUserTo()));
+		out.println(String.format("%-12s%s", "Type:", transfer.getTransferType()));
+		out.println(String.format("%-12s%s", "Status:", transfer.getTransferStatus()));
+		out.println(String.format("%-12s%s", "Amount:", "$" + transfer.getAmount()));
+		
+		out.println(String.format("%50s", "").replace(' ', '-'));
+		out.println();
+		out.flush();
+
+	}
+
+	public void displayInvalidId(int id)
+	{
+		out.println("\n*** ID " + id + " is not found ***\n");
 	}
 }
