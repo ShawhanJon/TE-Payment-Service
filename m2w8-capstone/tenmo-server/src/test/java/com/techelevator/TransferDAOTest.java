@@ -1,23 +1,23 @@
 package com.techelevator;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
-import com.techelevator.tenmo.dao.AccountDAO;
+import com.techelevator.tenmo.dao.TransferDAO;
+import com.techelevator.tenmo.dao.UserDAO;
 
-public class AccountDAOTest extends DAOIntegrationTest{
+public class TransferDAOTest extends DAOIntegrationTest{
 	
 
-	private AccountDAO dao;
+	private TransferDAO dao;
+	private UserDAO userdao;
 	private JdbcTemplate jdbcTemplate;
 	
 	
 	@BeforeAll
 	public void setup() {
 		
-			dao = new AccountDAO(getDataSource());
+			//dao = new AccountDAO(getDataSource());
 			jdbcTemplate = new JdbcTemplate(getDataSource());
 		}
 	
@@ -25,6 +25,7 @@ public class AccountDAOTest extends DAOIntegrationTest{
 	public void test_get_account() {
 		
 	}
+}
 
 //	@Test
 //	public void test_get_all_venues() {
