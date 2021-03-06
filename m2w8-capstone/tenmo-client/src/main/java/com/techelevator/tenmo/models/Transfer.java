@@ -1,62 +1,142 @@
 package com.techelevator.tenmo.models;
 
-
-
 public class Transfer {
 
-	private int transfer_id;
-	private int transfer_type_id;
-	private int transfer_status_id;
-	private Double amount;
-	private int account_to;
-	private int account_from;
+	private int transferId;
+	private int transferType;
+	private String typeName;
+	private int statusId;
+	private String statusName;
+	private int accountFrom;
+	private String fromUsername;
+	private int accountTo;
+	private String toUsername;
+	private double amount;
 
-	public int getAccount_from() {
-		return account_from;
+	public Transfer() {
+		
+	}
+	
+	public String viewTransfers(User user) {
+		if(fromUsername.equals(user.getUsername())) {
+			return transferId + "\t TO:   " + toUsername + "\t $" + amount;
+		}
+		else return transferId + "\t FROM: " + fromUsername+ "\t $" + amount;
+	}
+				
+	@Override	
+	public String toString() {
+		return	"\n ***************************" +
+				"\n  Request Transfer Details" +
+				"\n ***************************" +
+				"\n ID: " + transferId +
+				"\n Type: " + transferType + " " + typeName +
+				"\n Status: " + statusId + " " + statusName +
+				"\n From: " + accountFrom + " " + fromUsername + 
+				"\n To: " + accountTo + " " + toUsername + 
+				"\n Amount: "+ amount;
 	}
 
-	public void setAccount_from(int account_from) {
-		this.account_from = account_from;
-	}
-
-	public Double getAmount() {
-		return amount;
-	}
-
-	public void setAmount(Double amount) {
+	public Transfer(int transferId, int transferType, String typeName, int statusId, String statusName, int accountFrom,
+		String fromUsername, int accountTo, String toUsername, double amount) {
+		this.transferId = transferId;
+		this.transferType = transferType;
+		this.typeName = typeName;
+		this.statusId = statusId;
+		this.statusName = statusName;
+		this.accountFrom = accountFrom;
+		this.fromUsername = fromUsername;
+		this.accountTo = accountTo;
+		this.toUsername = toUsername;
 		this.amount = amount;
 	}
 
-	public int getAccount_to() {
-		return account_to;
+	public String getToUser() {
+		return toUsername;
 	}
 
-	public void setAccount_to(int account_to) {
-		this.account_to = account_to;
+	public void setToUser(String userName) {
+		this.toUsername = userName;
 	}
 
-	public int getTransfer_id() {
-		return transfer_id;
+	public int getTransferId() {
+		return transferId;
 	}
 
-	public void setTransfer_id(int transfer_id) {
-		this.transfer_id = transfer_id;
+	public void setTransferId(int transferId) {
+		this.transferId = transferId;
 	}
 
-	public int getTransfer_type_id() {
-		return transfer_type_id;
+	public int getTransferType() {
+		return transferType;
 	}
 
-	public void setTransfer_type_id(int transfer_type_id) {
-		this.transfer_type_id = transfer_type_id;
+	public void setTransferType(int transferType) {
+		this.transferType = transferType;
 	}
 
-	public int getTransfer_status_id() {
-		return transfer_status_id;
+	public int getStatusId() {
+		return statusId;
 	}
 
-	public void setTransfer_status_id(int transfer_status_id) {
-		this.transfer_status_id = transfer_status_id;
+	public void setStatusId(int statusId) {
+		this.statusId = statusId;
+	}
+
+	public int getAccountFrom() {
+		return accountFrom;
+	}
+
+	public void setAccountFrom(int accountFrom) {
+		this.accountFrom = accountFrom;
+	}
+
+	public int getAccountTo() {
+		return accountTo;
+	}
+
+	public void setAccountTo(int accountTo) {
+		this.accountTo = accountTo;
+	}
+
+	public double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
+
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
+	}
+
+	public String getStatusName() {
+		return statusName;
+	}
+
+	public void setStatusName(String statusName) {
+		this.statusName = statusName;
+	}
+
+	public String getFromUsername() {
+		return fromUsername;
+	}
+
+	public void setFromUsername(String fromUsername) {
+		this.fromUsername = fromUsername;
+	}
+
+	public String getToUsername() {
+		return toUsername;
+	}
+
+	public void setToUsername(String toUsername) {
+		this.toUsername = toUsername;
 	}
 
 }

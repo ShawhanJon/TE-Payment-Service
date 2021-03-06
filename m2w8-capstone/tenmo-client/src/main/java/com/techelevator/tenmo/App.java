@@ -1,15 +1,17 @@
 package com.techelevator.tenmo;
 
-import org.springframework.web.client.RestTemplate;
-
 import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
-import com.techelevator.tenmo.models.TransferBack;
-import com.techelevator.tenmo.models.User;
+import com.techelevator.tenmo.models.TransferDTO;
 import com.techelevator.tenmo.models.UserCredentials;
+import com.techelevator.tenmo.services.AccountServiceException;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.AuthenticationServiceException;
+import com.techelevator.tenmo.services.RestAccountService;
+import com.techelevator.tenmo.services.RestTransferService;
+import com.techelevator.tenmo.services.TransferServiceException;
 import com.techelevator.view.ConsoleService;
+import com.techelevator.tenmo.models.Account;
 
 public class App {
 
@@ -20,6 +22,7 @@ public class App {
 	private static final String LOGIN_MENU_OPTION_LOGIN = "Login";
 	private static final String[] LOGIN_MENU_OPTIONS = { LOGIN_MENU_OPTION_REGISTER, LOGIN_MENU_OPTION_LOGIN,
 			MENU_OPTION_EXIT };
+	
 	private static final String MAIN_MENU_OPTION_VIEW_BALANCE = "View your current balance";
 	private static final String MAIN_MENU_OPTION_SEND_BUCKS = "Send TE bucks";
 	private static final String MAIN_MENU_OPTION_VIEW_PAST_TRANSFERS = "View your past transfers";
@@ -29,13 +32,20 @@ public class App {
 	private static final String[] MAIN_MENU_OPTIONS = { MAIN_MENU_OPTION_VIEW_BALANCE, MAIN_MENU_OPTION_SEND_BUCKS,
 			MAIN_MENU_OPTION_VIEW_PAST_TRANSFERS, MAIN_MENU_OPTION_REQUEST_BUCKS,
 			MAIN_MENU_OPTION_VIEW_PENDING_REQUESTS, MAIN_MENU_OPTION_LOGIN, MENU_OPTION_EXIT };
-
+	
+	private static final String PENDING_REQUEST_MENU_VIEW_PENDING = "View your pending requests";
+	private static final String PENDING_REQUEST_MENU_VIEW_REQUEST_TRANSFERS = "View all of your Request Transfers";
+	private static final String PENDING_REQUEST_MENU_RECONCILE_REQUESTS = "Approve or Reject pending Request Transfers";
+	private static final String MAIN_MENU = "Go to main menu";
+	private static final String[] PENDING_REQUEST_MENU_OPTIONS = {PENDING_REQUEST_MENU_VIEW_PENDING, PENDING_REQUEST_MENU_VIEW_REQUEST_TRANSFERS, PENDING_REQUEST_MENU_RECONCILE_REQUESTS, MAIN_MENU};
+			
 	private AuthenticatedUser currentUser;
 	private ConsoleService console;
 	private AuthenticationService authenticationService;
-	public RestTemplate rest = new RestTemplate();
+	private RestAccountService accountService = new RestAccountService(API_BASE_URL);
+	private RestTransferService transferService = new RestTransferService(API_BASE_URL);
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws AccountServiceException, TransferServiceException {
 		App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL));
 		app.run();
 	}
@@ -45,7 +55,7 @@ public class App {
 		this.authenticationService = authenticationService;
 	}
 
-	public void run() throws Exception {
+	public void run() throws AccountServiceException, TransferServiceException {
 		System.out.println("*********************");
 		System.out.println("* Welcome to TEnmo! *");
 		System.out.println("*********************");
@@ -54,7 +64,7 @@ public class App {
 		mainMenu();
 	}
 
-	private void mainMenu() throws Exception {
+	private void mainMenu() throws AccountServiceException, TransferServiceException {
 		while (true) {
 			String choice = (String) console.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 			if (MAIN_MENU_OPTION_VIEW_BALANCE.equals(choice)) {
@@ -62,7 +72,7 @@ public class App {
 			} else if (MAIN_MENU_OPTION_VIEW_PAST_TRANSFERS.equals(choice)) {
 				viewTransferHistory();
 			} else if (MAIN_MENU_OPTION_VIEW_PENDING_REQUESTS.equals(choice)) {
-				viewPendingRequests();
+				pendingMenu();
 			} else if (MAIN_MENU_OPTION_SEND_BUCKS.equals(choice)) {
 				sendBucks();
 			} else if (MAIN_MENU_OPTION_REQUEST_BUCKS.equals(choice)) {
@@ -76,189 +86,201 @@ public class App {
 		}
 	}
 
-	private void viewCurrentBalance() throws AuthenticationServiceException {
-		double balance = authenticationService.getBalance(currentUser.getToken());
-		System.out.println("Your current account balance is $" + balance);
-	}
-
-	private void viewTransferHistory() throws AuthenticationServiceException {
-		TransferBack[] transfers = authenticationService.viewTransfers(currentUser.getToken(), 
-				currentUser.getUser().getId());
-
-		System.out.println("-------------------------------------------");
-		System.out.println("Transfers");
-		System.out.println("ID          From		To           Amount");
-		System.out.println("-------------------------------------------");
-		try {
-			for (TransferBack transfer : transfers) {
-				System.out.println(transfer.getTransferId() + "          " + transfer.getUsernameFrom() + "		"
-						+ transfer.getUsernameTo() + "		" + transfer.getAmount());
+	private void pendingMenu() throws AccountServiceException, TransferServiceException{
+		while(true) {
+			String choice =(String) console.getChoiceFromOptions(PENDING_REQUEST_MENU_OPTIONS);
+			if(PENDING_REQUEST_MENU_VIEW_PENDING.equals(choice)) {
+				viewPendingRequests();
 			}
-		} catch (NullPointerException e) {
-			System.out.println("No previous transfers to view.");
-		}
-		viewTransferDetails();
-
-	}
-
-	private void viewTransferDetails() throws AuthenticationServiceException {
-		TransferBack[] transfers = authenticationService.viewTransfers(currentUser.getToken(),
-				currentUser.getUser().getId());
-		Integer transferId = console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel)");
-		for (int i = 0; i < transfers.length; i++) {
-			if (transferId != 0 && transferId == transfers[i].getTransferId()) {
-				String transferType = "";
-				String transferStatus = "";
-				if (transfers[i].getTransferTypeId() == 1) {
-					transferType = "Request";
-				} else if (transfers[i].getTransferTypeId() == 2) {
-					transferType = "Send";
-				}
-				if (transfers[i].getTransferStatusId() == 1) {
-					transferStatus = "Pending";
-				} else if (transfers[i].getTransferStatusId() == 2) {
-					transferStatus = "Approved";
-				} else if (transfers[i].getTransferStatusId() == 3) {
-					transferStatus = "Rejected";
-				}
-
-				System.out.println("-------------------------------------------");
-				System.out.println("Transfer Details");
-				System.out.println("-------------------------------------------");
-				System.out.println("Id: " + transferId);
-				System.out.println("From: " + transfers[i].getUsernameFrom());
-				System.out.println("To: " + transfers[i].getUsernameTo());
-				System.out.println("Type: " + transferType);
-				System.out.println("Status: " + transferStatus);
-				System.out.println("Amount: $" + transfers[i].getAmount());
-
+			else if(PENDING_REQUEST_MENU_VIEW_REQUEST_TRANSFERS.equals(choice)) {
+				viewRequestTransfers();
 			}
-
+			else if(PENDING_REQUEST_MENU_RECONCILE_REQUESTS.equals(choice)) {
+				reconcilePendingRequests();
+			}
+			else {
+				mainMenu();
+			}
 		}
 	}
+	
 
-	private void viewPendingRequests() throws AuthenticationServiceException {
-		TransferBack[] pendingTransfers = null;
-		double balance = authenticationService.getBalance(currentUser.getToken());
-		double pendTransAmt = 0.0;
-		try {
-			pendingTransfers = authenticationService.viewPending(currentUser.getToken(), currentUser.getUser().getId());
-			System.out.println("-------------PENDING TRANSFERS-------------");
-			System.out.println("ID          To                     Amount");
+	private void viewCurrentBalance() throws AccountServiceException {
+		System.out.println("Your balance is: $" + accountService.getAccountBalance());
+
+	}
+
+	private void viewTransferHistory() {
+		Transfer[] transfers = transferService.getTransfersforUser();
+		if (transfers.length == 0) {
+			System.out.println("There are no transactions for this user");
+		} else
+			System.out.println("Your transfer history: \n");
 			System.out.println("-------------------------------------------");
-			for (TransferBack pendingTransfer : pendingTransfers) {
-				System.out.println(pendingTransfer.getTransferId() + "          " + pendingTransfer.getUsernameTo()
-						+ "                $" + pendingTransfer.getAmount());
-				pendTransAmt = pendingTransfer.getAmount();
+			System.out.println("Transfer");
+			System.out.println("ID \t From/To \t Amount");
+			System.out.println("-------------------------------------------");
+			for (Transfer t : transfers) {
+				System.out.println(t.viewTransfers(currentUser.getUser()));
 			}
-		} catch (NullPointerException e) {
-			System.out.println("You have no pending transfers.");
-			System.exit(0);
-		}
-		System.out.println("---------");
-		if (pendingTransfers.length == 0) {
-			System.out.println("You have no pending transfers. Enter any number to cancel.");
-		}
+			System.out.println();
+			int transferId = console.getUserInputInteger("Please enter the transfer ID to view details (0 to cancel)");
+			if(transferId != 0)
+			{
+				System.out.println(transferService.getTransferById(transferId).toString());
+			}
 
-		Integer transferId = console.getUserInputInteger("Please enter transfer ID to approve/reject (0 to cancel)");
-		Integer choice = null;
-		if (transferId != 0 && pendingTransfers.length > 0) {
-			System.out.println("1: Approve");
-			System.out.println("2: Reject");
-			System.out.println("0: Don't approve or reject");
-			System.out.println("---------");
-			choice = console.getUserInputInteger("Please choose an option");
-			if (choice == 1 && balance > pendTransAmt) {
-				try {
-					authenticationService.updatePendingApprove(currentUser.getToken(), currentUser.getUser().getId(),
-							transferId);
-				} catch (NullPointerException e) {
-					System.out.println("Something went wrong");
-				}
-			} else if (choice == 2) {
-				try {
-					authenticationService.updatePendingReject(currentUser.getToken(), currentUser.getUser().getId(),
-							transferId);
-				} catch (NullPointerException e) {
-					System.out.println("Something went wrong");
-				}
-				System.out.println("Cancelling...");
-			} 
-			else if (choice == 1 && balance < pendTransAmt) {
-				System.out.println("Not enough funds...");
+	}
+
+	private void viewPendingRequests() throws TransferServiceException {
+		Transfer[] pending = transferService.viewPendingTransfers();
+		if(pending.length == 0) {
+			System.out.println("There are no pending transactions");
+		}
+		else
+			System.out.println("Pending transactions: \n");
+			System.out.println("\n ***************************");
+			System.out.println("\n  Pending Transfer Details");
+			System.out.println("\n ***************************");
+			
+			for(Transfer p : pending) {
+				System.out.println(p.toString());	
 			}
-			else if (choice == 0) {
-				;
+	}
+	
+	private void reconcilePendingRequests() throws TransferServiceException, AccountServiceException {
+		viewRequestTransfers();
+		
+		TransferDTO transferDto = new TransferDTO();
+		Transfer pendingTransfer;
+		boolean goodInput = false;
+		
+		while (!goodInput) {
+		
+			transferDto.setTransferId(console.getUserInputInteger("\nPlease enter the request ID to reconcile"));
+			pendingTransfer = transferService.getTransferById(transferDto.getTransferId());
+			
+			transferDto.setAmount(pendingTransfer.getAmount());
+			transferDto.setTransferToId(pendingTransfer.getAccountTo());
+			transferDto.setTransferFromId(pendingTransfer.getAccountFrom());
+			transferDto.setTransferTypeId(pendingTransfer.getTransferType());
+			
+			try {
+				int selection = console.getUserInputInteger("Please enter '1' to Approve or '2' to Reject request or '0' to return to menu. \n If approved, money will be deducted from your account immediately.");
+				
+				if(selection == 1) {
+					transferDto.setTransferStatusId(2);
+					transferService.reconcileTransfer(transferDto);
+					goodInput = true;
+					System.out.println("Request Closed");
+				}
+				else if(selection == 2) {
+					transferDto.setTransferStatusId(3);
+					transferService.reconcileTransfer(transferDto);
+					goodInput = true;
+					System.out.println("Request Closed");
+				}
+			}
+			catch (Exception e) {
+				System.out.println(e.toString());
 			}
 		}
 	}
 
-	private void sendBucks() throws Exception {
-		
-		System.out.println("--------------------------");
-		System.out.println("Users");
-		System.out.println("ID     NAME");
-		System.out.println("--------------------------");
-		User[] users = authenticationService.getUsers(currentUser.getToken());
-		for (User u : users) {
-			System.out.println(u.getId() + "     " + u.getUsername());
+	private void viewRequestTransfers() throws TransferServiceException, AccountServiceException {
+		Transfer[] pending = transferService.viewPendingRequests(currentUser.getUser().getId());
+		if(pending.length == 0) {
+			System.out.println("There are no pending transfer requests");
+			pendingMenu();
 		}
-		System.out.println("--------------------------");
-
-		
-		double balance = authenticationService.getBalance(currentUser.getToken());
-		Integer toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
-		Double amount = console.getUserInputDouble("Enter amount");
-
-			Integer fromUserId = currentUser.getUser().getId();
-			int transferTypeId = 2;
-			int transferStatusId = 2;
-			Transfer transferProcess = new Transfer();
+		else
+			System.out.println("Pending Requests: \n");
+			System.out.println("\n ***************************");
+			System.out.println("\n  Request Transfer Details");
+			System.out.println("\n ***************************");
 			
-			transferProcess.setAccount_from(fromUserId);
-			transferProcess.setAccount_to(toUserId);
-			transferProcess.setAmount(amount);
-			transferProcess.setTransfer_status_id(transferStatusId);
-			transferProcess.setTransfer_type_id(transferTypeId);
-			authenticationService.transferSend(currentUser.getToken(), transferProcess);
-			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
-		} 
-	
-	
+			for(Transfer p : pending) {
+				System.out.println(p.toString());	
+			}	
+	}
 
-	private void requestBucks() throws Exception {
+	private void sendBucks() throws AccountServiceException {
+		TransferDTO transferDto = new TransferDTO();
+		boolean goodInput = false;
+
+		transferDto.setTransferTypeId(2);
+		transferDto.setTransferStatusId(2);
 		
-		System.out.println("--------------------------");
-		System.out.println("Users");
-		System.out.println("ID     NAME");
-		System.out.println("--------------------------");
-		User[] users = authenticationService.getUsers(currentUser.getToken());
-		for (User u : users) {
-			System.out.println(u.getId() + "     " + u.getUsername());
+		while (!goodInput) {
+		Account[] theAccounts = transferService.viewAvailableAccounts();
+		System.out.println("-------------------------------------------");
+		System.out.println("User    Username");
+		System.out.println("  ID"); 
+		System.out.println("-------------------------------------------");
+		System.out.println();
+		for (Account account : theAccounts) {
+			System.out.println("(" + account.getAccountId() + ")      " + account.getUsername());
 		}
-		System.out.println("--------------------------");
-		
-		int fromUserId = console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel)");
-		double amount = console.getUserInputDouble("Enter amount");
-		
-			Integer toUserId = currentUser.getUser().getId();
-			int transferTypeId = 1;
-			int transferStatusId = 1;
-			Transfer transferProcess = new Transfer();
-			transferProcess.setAccount_from(fromUserId);
-			transferProcess.setAccount_to(toUserId);
-			transferProcess.setAmount(amount);
-			transferProcess.setTransfer_status_id(transferStatusId);
-			transferProcess.setTransfer_type_id(transferTypeId);
+		System.out.println("----------------------");
+		transferDto.setTransferToId(console.getUserInputInteger("\nPlease enter the account ID to transfer to"));
 			try {
-			authenticationService.transferRequest(currentUser.getToken(), transferProcess);
-			}catch (NullPointerException e) {
-				System.out.println("Error occured. Please try again.");
-				System.exit(0);
-			}
-			System.out.println(amount + " TE Bucks were requested from user " + fromUserId);
-		} 
+				transferDto.setAmount(console.getUserInputDouble("Please enter the amount you would like to send"));
+				Transfer transfer = transferService.sendTransfer(transferDto);
+				goodInput = true;
 
+				System.out.println();
+				System.out.println("\n *************************");
+				System.out.println("\n Transfer Details");
+				System.out.println("\n *************************");
+				System.out.println(transfer.toString());
+				System.out.println("Approved");
+			
+			} catch (Exception e) {
+				 System.out.println(e.toString());
+			}
+			
+		}
+
+	}
+
+	private void requestBucks() throws TransferServiceException, AccountServiceException {
+		TransferDTO transferDto = new TransferDTO();
+		boolean goodInput = false;
+
+		transferDto.setTransferTypeId(1);
+		transferDto.setTransferStatusId(1);
+		
+		while (!goodInput) {
+		Account[] theAccounts = transferService.viewAvailableAccounts();
+		System.out.println("-------------------------------------------");
+		System.out.println("             REQUEST TRANSFER  ");
+		System.out.println();
+		System.out.println("User     Username");
+		System.out.println("  ID"); 
+		System.out.println("-------------------------------------------");
+		System.out.println();
+		for (Account account : theAccounts) {
+			System.out.println("(" + account.getAccountId() + ")      " + account.getUsername());
+		}
+		System.out.println("----------------------");
+		transferDto.setTransferFromId(console.getUserInputInteger("\nPlease enter the account ID to transfer to"));
+			try {
+				transferDto.setAmount(console.getUserInputDouble("Please enter the amount you would like to request"));
+				goodInput = true;
+			} catch (Exception e) {
+				e.getMessage();
+			}
+			Transfer transfer = transferService.requestTransfer(transferDto);
+			System.out.println();
+			System.out.println("\n *************************");
+			System.out.println("\n Transfer Details");
+			System.out.println("\n *************************");
+			System.out.println(transfer.toString());
+			System.out.println("Request has been sent");
+			
+		}
+
+	}
 
 	private void exitProgram() {
 		System.exit(0);
@@ -307,6 +329,8 @@ public class App {
 			UserCredentials credentials = collectUserCredentials();
 			try {
 				currentUser = authenticationService.login(credentials);
+				RestAccountService.AUTH_TOKEN = currentUser.getToken();
+				RestTransferService.AUTH_TOKEN = currentUser.getToken();
 			} catch (AuthenticationServiceException e) {
 				System.out.println("LOGIN ERROR: " + e.getMessage());
 				System.out.println("Please attempt to login again.");
@@ -318,18 +342,5 @@ public class App {
 		String username = console.getUserInput("Username");
 		String password = console.getUserInput("Password");
 		return new UserCredentials(username, password);
-	}
-
-	public void showUsers() throws Exception {
-		System.out.println("--------------------------");
-		System.out.println("Users");
-		System.out.println("ID     NAME");
-		System.out.println("--------------------------");
-		User[] users = authenticationService.getUsers(currentUser.getToken());
-		for (User u : users) {
-			System.out.println(u.getId() + "     " + u.getUsername());
-		}
-		System.out.println("--------------------------");
-
 	}
 }

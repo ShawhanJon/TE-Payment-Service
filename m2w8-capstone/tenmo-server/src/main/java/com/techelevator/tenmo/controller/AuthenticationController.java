@@ -1,14 +1,10 @@
 package com.techelevator.tenmo.controller;
 
-import java.security.Principal;
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -32,7 +28,6 @@ import com.techelevator.tenmo.security.jwt.TokenProvider;
 /**
  * Controller to authenticate users.
  */
-@PreAuthorize("isAuthenticated()")
 @RestController
 public class AuthenticationController {
 
@@ -45,16 +40,7 @@ public class AuthenticationController {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userDAO = userDAO;
     }
-    
-    
-    @RequestMapping(value="/balance",method=RequestMethod.GET)
-    public double getBalance(Principal principal) {
-    	return userDAO.getBalance(principal);
-    }
-    
-    
-    
-    @PreAuthorize("permitAll")
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginDTO loginDto) {
 
@@ -72,12 +58,6 @@ public class AuthenticationController {
         return new ResponseEntity<>(new LoginResponse(jwt, user), httpHeaders, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/account/allaccounts", method = RequestMethod.GET)
-    public List<User> getAccount(Principal principal) {
-    	return userDAO.findAll();
-    }
-    
-    @PreAuthorize("permitAll")
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public void register(@Valid @RequestBody RegisterUserDTO newUser) {

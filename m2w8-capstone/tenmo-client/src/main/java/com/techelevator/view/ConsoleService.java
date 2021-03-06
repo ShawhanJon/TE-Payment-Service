@@ -73,7 +73,6 @@ public class ConsoleService {
 		} while(result == null);
 		return result;
 	}
-	
 	public Double getUserInputDouble(String prompt) {
 		Double result = null;
 		do {

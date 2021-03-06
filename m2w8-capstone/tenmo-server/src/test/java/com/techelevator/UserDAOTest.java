@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
-import com.techelevator.tenmo.dao.JdbcUserDAO;
+import com.techelevator.tenmo.dao.jdbc.JDBCUserDAO;
 
 
 public class UserDAOTest extends DAOIntegrationTest {
     private static DataSource dataSource;
 
-    	private JdbcUserDAO dao;	
+    	private JDBCUserDAO dao;	
 
      
      @BeforeEach
