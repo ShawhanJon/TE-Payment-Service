@@ -41,7 +41,7 @@ public class JDBCTransferDAO implements TransferDAO
 					+ "		ON t.transfer_type_id = tt.transfer_type_id "
 					+ "JOIN transfer_statuses AS ts "
 					+ "		ON t.transfer_status_id = ts.transfer_status_id "
-					+ "WHERE t.transfer_id = ?; ";
+					+ "WHERE t.transfer_id = ? ";
 		
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, id);
 		
@@ -86,7 +86,7 @@ public class JDBCTransferDAO implements TransferDAO
 							+ ", account_to"
 							+ ", amount) "
 							+ "VALUES "
-							+ "(?, ?, ?, ?, ?, ?);";
+							+ "(?, ?, ?, ?, ?, ?)";
 				
 				jdbcTemplate.update(sql, transferId, transferType, transferStatus,
 										accountFrom, accountTo, amount);
@@ -112,7 +112,7 @@ public class JDBCTransferDAO implements TransferDAO
 						+ ", account_to"
 						+ ", amount) "
 						+ "VALUES "
-						+ "(?, ?, ?, ?, ?, ?);";
+						+ "(?, ?, ?, ?, ?, ?)";
 			
 			jdbcTemplate.update(sql, transferId, transferType, transferStatus,
 									accountFrom, accountTo, amount);

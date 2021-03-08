@@ -31,6 +31,7 @@ public class UserService
 		this.user = user;
 	}
 	
+//	Method lists all users in system that user can request or send bucks to.
 	public List<User> getAllUsers()
 	{
 		
@@ -48,6 +49,7 @@ public class UserService
 		return users;
 	}
 
+//	Method gets user by username.
 	public User getUserByName(String username)
 	{
 		User user = null;
@@ -63,7 +65,7 @@ public class UserService
 		return user;	
 	}
 
-	
+//	Methods gets the current users balance.
 	public BigDecimal getBalance()
 	{
 		BigDecimal balance = BigDecimal.valueOf(0);
@@ -94,6 +96,7 @@ public class UserService
 		return balance;
 	}
 
+//	Method lists transfers based of current user id.
 	public List<Transfer> getTransfersByUserId(int userId)
 	{
 		List<Transfer> transfers = null;
@@ -125,6 +128,7 @@ public class UserService
 	}
 	
 	
+	@SuppressWarnings("rawtypes")
 	private HttpEntity makeAuthEntity()
 	{
 		HttpHeaders headers = new HttpHeaders();
@@ -133,6 +137,7 @@ public class UserService
 		return entity;
 	}
 	
+	@SuppressWarnings("unused")
 	private HttpEntity<User> makeUserEntity(User user)
 	{
 		HttpHeaders headers = new HttpHeaders();

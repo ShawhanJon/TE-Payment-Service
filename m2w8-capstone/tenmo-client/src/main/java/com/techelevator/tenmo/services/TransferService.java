@@ -31,6 +31,8 @@ public class TransferService
 		this.user = user;
 	}
 	
+	
+//	Method allows user to send or request bucks.
 	public Transfer createTransfer(Transfer transfer)
 	{
 		Transfer newTransfer = null;
@@ -49,6 +51,7 @@ public class TransferService
 		return newTransfer;
 	}
 
+//	Method updates transfers.
 	public Transfer updateTransfer(Transfer transfer)
 	{
 		Transfer updatedTransfer = null;
@@ -67,6 +70,7 @@ public class TransferService
 		return updatedTransfer;
 	}
 
+//	Method lists all transfers for the current user.
 	public List<Transfer> getAllTransfers()
 	{
 		List<Transfer> transfers = null;
@@ -86,6 +90,7 @@ public class TransferService
 		return transfers;
 	}
 
+//	Method lists all pending transfers for the current user.
 	public List<Transfer> getPendingTransfers()
 	{
 		List<Transfer> transfers = null;
@@ -114,7 +119,7 @@ public class TransferService
 		return pending;
 	}
 
-	
+//	Method allows user to get transfer details for specific transfer.
 	public Transfer getById(int id)
 	{
 		Transfer transfer = null;
@@ -133,6 +138,7 @@ public class TransferService
 		return transfer;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private HttpEntity makeAuthEntity()
 	{
 		HttpHeaders headers = new HttpHeaders();

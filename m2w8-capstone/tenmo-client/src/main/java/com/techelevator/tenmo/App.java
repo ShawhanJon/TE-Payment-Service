@@ -31,6 +31,7 @@ public class App
 	private static final String MAIN_MENU_OPTION_REQUEST_BUCKS = "Request TE bucks";
 	private static final String MAIN_MENU_OPTION_VIEW_PENDING_REQUESTS = "View your pending requests";
 	private static final String MAIN_MENU_OPTION_LOGIN = "Login as different user";
+	
 	private static final String PENDING_REQUESTS_OPTION_APPROVE = "Approve";
 	private static final String PENDING_REQUESTS_OPTION_REJECT = "Reject";
 	private static final String PENDING_REQUESTS_OPTION_CANCEL = "Don't approve or reject";
@@ -109,12 +110,15 @@ public class App
 		}
 	}
 
+	
+//	Method allows us to view the current balance that calls code in UserService Class
 	private void viewCurrentBalance()
 	{
-		// TODO Auto-generated method stub
 		console.displayBalance(userService.getBalance());
 	}
 
+//	Method shows transfer history based off current user.
+//	Creates a list from the getAllTransfers method and uses displayTransferDetails from TransferService Class.
 	private void viewTransferHistory()
 	{
 		List<Transfer> transfers = transferService.getAllTransfers();
@@ -126,11 +130,13 @@ public class App
 		}
 	}
 	
+//	Method shows pending transfer requests for current user.
+//	Utilizes displayTransfer method to show transfers, transferStatus to set/get current status, and updateTransfer to update the current transfers.
 	private void viewPendingRequests()
 	{
 		List<Transfer> transfers = transferService.getPendingTransfers();
 		Transfer transferToUpdate = null;
-		console.displayPendingTransfers(transfers);
+		console.displayTransfers(transfers, currentUser.getUser().getUsername());
 		int selection = console.getUserInputInteger("Please enter transfer ID to view approve/reject (0 to cancel)");
 		if(selection !=0)
 		{
@@ -148,21 +154,17 @@ public class App
 					transferToUpdate.setTransferStatus(STATUS_REJECTED);
 					transferService.updateTransfer(transferToUpdate);
 				}
-			}
-			//PENDING_REQUESTS_OPTION_APPROVE, PENDING_REQUESTS_OPTION_REJECT, 
+			} 
 		}
 	}
 
+//	Method allows user to send money to another user. Using the createTransfer method in TransferService Class.
 	private void sendBucks()
 	{
 		int sendTo;
 		
 		Transfer transfer = new Transfer();
 		transfer.setUserFrom(currentUser.getUser().getUsername());
-		
-//		String[] usernames = userService.getAllUserNames();
-//		String userTo = (String) console.getChoiceFromOptions(usernames);
-//		transfer.setUserTo(userTo);
 		
 		List<User> users = userService.getAllUsers();
 		console.displayUsers(users);
@@ -185,6 +187,7 @@ public class App
 		}
 	}
 
+//	Method allows user to request money from another user. Using the createTransfer method in TransferService Class.
 	private void requestBucks()
 	{
 		int requestFrom;

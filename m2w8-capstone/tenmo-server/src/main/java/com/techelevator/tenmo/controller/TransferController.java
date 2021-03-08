@@ -19,6 +19,8 @@ import com.techelevator.tenmo.model.Transfer;
 
 @RestController
 @PreAuthorize("isAuthenticated()")
+
+//Mapping starts here
 @RequestMapping(path = "/transfers")
 public class TransferController
 {
@@ -27,6 +29,7 @@ public class TransferController
 	@Autowired
 	TransferDAO transferDao;
 
+//	Mapped as a GET Method using base url of /transfers
 	@GetMapping()
 	public List<Transfer> getCurrentUserTransfers(Principal principal)
 	{
@@ -36,12 +39,14 @@ public class TransferController
 		return transfers;
 	}
 	
+//	Mapped as a GET Method using /transfers/{id}
 	@GetMapping("/{id}")
 	public Transfer getById(@PathVariable int id)
 	{
 		return transferDao.get(id);
 	}
 	
+//	Mapped as a PUT Method to update transfers using /transfers/update/{id}
 	@PutMapping("/update/{id}")
 	public Transfer updateTransfer(@RequestBody Transfer transfer, Principal principal, @PathVariable int id)
 	{
@@ -54,6 +59,7 @@ public class TransferController
 		return updatedTransfer;
 	}
 	
+//	Mapped as a POST Method using base url of /transfers
 	@PostMapping()
 	public Transfer createTransfer(@RequestBody Transfer transfer, Principal principal)
 	{

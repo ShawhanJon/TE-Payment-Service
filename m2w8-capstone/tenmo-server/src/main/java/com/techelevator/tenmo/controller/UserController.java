@@ -18,6 +18,8 @@ import com.techelevator.tenmo.model.User;
 
 @RestController
 @PreAuthorize("isAuthenticated()")
+
+//Mapping starts here
 @RequestMapping(path = "/users")
 public class UserController
 {
@@ -26,6 +28,7 @@ public class UserController
 	@Autowired
 	TransferDAO transferDao;
 	
+//	Mapped as a GET Method using base url of /users
 	@GetMapping()
 	public List<User> getAll()
 	{
@@ -34,6 +37,7 @@ public class UserController
 		return users;
 	}
 	
+//	Mapped as a GET Method to get balance using /users/balance
 	@GetMapping("/balance")
 	public BigDecimal getBalance(Principal principal)
 	{
@@ -41,6 +45,7 @@ public class UserController
 		return user.getBalance();
 	}
 	
+//	Mapped as a GET Method to get balance using /users/balance/{id}
 	@GetMapping("/balance/{id}")
 	public BigDecimal getBalance(@PathVariable int id)
 	{
@@ -48,6 +53,7 @@ public class UserController
 		return user.getBalance();
 	}
 	
+//	Mapped as a GET Method to get transfers using /users/transfers/{id}
 	@GetMapping("/transfers/{id}")
 	public List<Transfer> getTransfersByUser(@PathVariable int id)
 	{
